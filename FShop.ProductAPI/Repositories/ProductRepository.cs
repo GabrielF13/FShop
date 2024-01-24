@@ -14,17 +14,12 @@ namespace FShop.ProductAPI.Repositories
 
         public async Task<IEnumerable<Product>> GetAll()
         {
-            return await _context.Products.ToListAsync();
+            return await _context.Products.Include(c=>c.Category).ToListAsync();
         }
 
         public async Task<Product> GetById(int id)
         {
-            var product = await _context.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
-
-            if (product == null)
-                return null;
-
-            return product;
+            return await _context.Products.Include(c => c.Category).Where(p => p.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<Product> Create(Product product)
@@ -44,8 +39,6 @@ namespace FShop.ProductAPI.Repositories
         public async Task<Product> DeleteById(int id)
         {
             var product = await GetById(id);
-            if (product == null)
-                return null;
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();

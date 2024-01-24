@@ -23,12 +23,7 @@ namespace FShop.ProductAPI.Repositories
 
         public async Task<Category> GetById(int id)
         {
-            var category = await _context.Categories.Where(c => c.CategoryID == id).FirstOrDefaultAsync();
-
-            if (category == null)
-                return null;
-
-            return category;
+            return await _context.Categories.Where(c => c.CategoryID == id).FirstOrDefaultAsync();
         }
 
         public async Task<Category> Create(Category category)
@@ -48,9 +43,6 @@ namespace FShop.ProductAPI.Repositories
         public async Task<Category> Delete(int id)
         {
             var product = await GetById(id);
-
-            if (product == null)
-                return null;
 
             _context.Categories.Remove(product);
             await _context.SaveChangesAsync();
