@@ -1,10 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace FShop.Web.Models
 {
     public class CategoryViewModel
     {
-        public int CategoryID { get; set; }
+        [JsonPropertyName("categoryID")]
+        public int CategoryId { get; set; }
+
+        [JsonPropertyName("name")]
         public string? Name { get; set; }
     }
 }
