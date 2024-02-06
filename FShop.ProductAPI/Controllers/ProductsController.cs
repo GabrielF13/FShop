@@ -1,4 +1,5 @@
 ﻿using FShop.ProductAPI.DTOs;
+using FShop.ProductAPI.Roles;
 using FShop.ProductAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ namespace FShop.ProductAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class ProductsController : ControllerBase
 {
     private readonly IProductService _productService;
@@ -61,6 +63,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = Role.Admin)]
     public async Task<ActionResult<ProductDTO>> Delete(int id)
     {
         var produtoDto = await _productService.GetProductById(id);

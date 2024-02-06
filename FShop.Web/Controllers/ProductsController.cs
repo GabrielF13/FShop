@@ -1,5 +1,9 @@
 ﻿using FShop.Web.Models;
+using FShop.Web.Roles;
 using FShop.Web.Services.Contracts;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -19,27 +23,31 @@ namespace FShop.Web.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductViewModel>>> Index()
         {
-            var result = await _productService.GetAllProducts();
+           
+            var result = await _productService.GetAllProducts(await GetAcessToken());
 
             if (result is null)
                 return View("Error");
-            
+
             return View(result);
         }
+
+        
 
         [HttpGet]
         public async Task<IActionResult> CreateProduct()
         {
-            ViewBag.CategoryId = new SelectList(await _categoryService.GetAllCategories(), "CategoryId", "Name");
+            ViewBag.CategoryId = new SelectList(await _categoryService.GetAllCategories(await GetAcessToken()), "CategoryId", "Name");
             return View();
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateProduct(ProductViewModel productVM)
         {
             if (ModelState.IsValid)
             {
-                var result = await _productService.CreateProduct(productVM);
+                var result = await _productService.CreateProduct(productVM, await GetAcessToken());
 
                 if (result != null)
                     return RedirectToAction(nameof(Index));
@@ -47,7 +55,7 @@ namespace FShop.Web.Controllers
             else
             {
                 ViewBag.CategoryId = new SelectList(await
-                                     _categoryService.GetAllCategories(), "CategoryId", "Name");
+                                     _categoryService.GetAllCategories(await GetAcessToken()), "CategoryId", "Name");
             }
             return View(productVM);
         }
@@ -55,9 +63,9 @@ namespace FShop.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> UpdateProduct(int id)
         {
-            ViewBag.CategoryId = new SelectList(await _categoryService.GetAllCategories(), "CategoryId", "Name");
+            ViewBag.CategoryId = new SelectList(await _categoryService.GetAllCategories(await GetAcessToken()), "CategoryId", "Name");
 
-            var result = await _productService.FindProductById(id);
+            var result = await _productService.FindProductById(id, await GetAcessToken());
 
             if (result is null)
                 return View("Error");
@@ -66,12 +74,13 @@ namespace FShop.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> UpdateProduct(ProductViewModel productVM)
         {
 
             if (ModelState.IsValid)
             {
-                var result = await _productService.UpdateProduct(productVM);
+                var result = await _productService.UpdateProduct(productVM, await GetAcessToken());
                 if (result is not null)
                     return RedirectToAction(nameof(Index));
             }
@@ -79,9 +88,10 @@ namespace FShop.Web.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var result = await _productService.FindProductById(id);
+            var result = await _productService.FindProductById(id, await GetAcessToken());
 
             if (result is null)
                 return View("Error");
@@ -90,14 +100,20 @@ namespace FShop.Web.Controllers
         }
 
         [HttpPost(), ActionName("DeleteProduct")]
+        [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var result = await _productService.DeleteProduct(id);
+            var result = await _productService.DeleteProduct(id, await GetAcessToken());
 
             if (!result)
                 return View("Error");
 
             return RedirectToAction("Index");
+        }
+
+        private async Task<string> GetAcessToken()
+        {
+            return await HttpContext.GetTokenAsync("access_token");
         }
     }
 }
