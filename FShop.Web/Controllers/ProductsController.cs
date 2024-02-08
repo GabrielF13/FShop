@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace FShop.Web.Controllers
 {
+    [Authorize(Roles = Role.Admin)]
     public class ProductsController : Controller
     {
         private readonly IProductService _productService;
@@ -42,7 +43,6 @@ namespace FShop.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> CreateProduct(ProductViewModel productVM)
         {
             if (ModelState.IsValid)
@@ -74,7 +74,6 @@ namespace FShop.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> UpdateProduct(ProductViewModel productVM)
         {
 
@@ -88,7 +87,6 @@ namespace FShop.Web.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var result = await _productService.FindProductById(id, await GetAcessToken());
@@ -100,7 +98,6 @@ namespace FShop.Web.Controllers
         }
 
         [HttpPost(), ActionName("DeleteProduct")]
-        [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var result = await _productService.DeleteProduct(id, await GetAcessToken());
