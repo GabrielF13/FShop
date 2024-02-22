@@ -1,11 +1,9 @@
-﻿using FShop.CartApi.Models;
-
-namespace FShop.CartApi.DTOs
+﻿namespace FShop.Web.Models
 {
-    public class CartItemDTO
+    public class CartItemViewModel
     {
         public int Id { get; set; }
-        public ProductDTO Product { get; set; } = new ProductDTO();
+        public ProductViewModel? Product { get; set; }
         public int Quantity { get; set; } = 1;
         public int ProductId { get; set; }
         public int CartHeaderId { get; set; }

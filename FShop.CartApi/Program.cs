@@ -50,6 +50,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
                         ServerVersion.AutoDetect(mySqlConnectionString)));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 
 builder.Services.AddCors(options =>

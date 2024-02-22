@@ -134,8 +134,7 @@ public class CartRepository : ICartRepository
 
     private async Task SaveProductInDataBase(CartDTO cartDto, Cart cart)
     {
-        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id ==
-                            cartDto.CartItens.FirstOrDefault().ProductId);
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == cartDto.CartItens.FirstOrDefault().ProductId);
 
         if (product is null)
         {
