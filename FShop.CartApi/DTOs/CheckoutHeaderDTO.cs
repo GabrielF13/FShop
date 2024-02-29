@@ -1,6 +1,6 @@
-﻿namespace FShop.Web.Models
+﻿namespace FShop.CartApi.DTOs
 {
-    public class CartHeaderViewModel
+    public class CheckoutHeaderDTO
     {
         public int Id { get; set; }
         public string UserId { get; set; } = string.Empty;
@@ -18,6 +18,8 @@
         public string CardNumber { get; set; } = string.Empty;
         public string NameOnCard { get; set; } = string.Empty;
         public string CVV { get; set; } = string.Empty;
-        public string ExpireMonthYear { get; set; } = string.Empty;
+        public string ExpireMothYear { get; set; } = string.Empty;
+        public int CartTotalItens { get; set; }
+        public IEnumerable<CartItemDTO>? CartItems { get; set; }
     }
 }

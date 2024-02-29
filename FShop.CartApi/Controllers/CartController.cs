@@ -16,6 +16,20 @@ public class CartController : ControllerBase
         _cartRepository = cartRepository;
     }
 
+
+    [HttpPost("checkout")]
+    public async Task<ActionResult<CheckoutHeaderDTO>> Checkout(CheckoutHeaderDTO checkoutDto)
+    {
+        var cart = await _cartRepository.GetCartByUserIdAsync(checkoutDto.UserId);
+        if (cart is null)
+            return NotFound($"Cart not found for user {checkoutDto.UserId}");
+
+        checkoutDto.CartItems = cart.CartItems;
+        checkoutDto.DateTime = DateTime.Now;
+
+        return Ok(checkoutDto);
+    }
+
     [HttpPost("applycoupon")]
     public async Task<ActionResult<CartDTO>> ApplyCoupon(CartDTO cartDto)
     {

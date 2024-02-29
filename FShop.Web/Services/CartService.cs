@@ -11,7 +11,7 @@ namespace FShop.Web.Services
         private readonly IHttpClientFactory _clientFactory;
         private readonly JsonSerializerOptions _options;
         private const string apiEndpoint = "/api/Cart";
-        private CartViewModel cartVM = new CartViewModel();
+        private CartViewModel cartHeeaderVM = new CartViewModel();
 
         public CartService(IHttpClientFactory clientFactory)
         {
@@ -29,7 +29,7 @@ namespace FShop.Web.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var apiResponse = await response.Content.ReadAsStreamAsync();
-                    cartVM = await JsonSerializer
+                    cartHeeaderVM = await JsonSerializer
                                   .DeserializeAsync<CartViewModel>
                                   (apiResponse, _options);
                 }
@@ -38,7 +38,7 @@ namespace FShop.Web.Services
                     return null;
                 }
             }
-            return cartVM;
+            return cartHeeaderVM;
         }
 
         public async Task<CartViewModel> AddItemToCartAsync(CartViewModel cartVM, string token)
@@ -146,9 +146,29 @@ namespace FShop.Web.Services
 
             return false;
         }
-        public Task<CartHeaderViewModel> CheckoutAsync(CartHeaderViewModel cartHeader, string token)
+        public async Task<CartHeaderViewModel> CheckoutAsync(CartHeaderViewModel cartHeaderVM, string token)
         {
-            throw new NotImplementedException();
+            var client = _clientFactory.CreateClient("CartApi");
+            PutTokenInHeaderAuthorization(token, client);
+
+            StringContent content = new StringContent(JsonSerializer.Serialize(cartHeaderVM),
+                                                 Encoding.UTF8, "application/json");
+
+            using (var response = await client.PostAsync($"{apiEndpoint}/checkout/", content))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var apiResponse = await response.Content.ReadAsStreamAsync();
+                    cartHeaderVM = await JsonSerializer
+                                  .DeserializeAsync<CartHeaderViewModel>
+                                  (apiResponse, _options);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            return cartHeaderVM;
         }
 
         private static void PutTokenInHeaderAuthorization(string token, HttpClient client)
