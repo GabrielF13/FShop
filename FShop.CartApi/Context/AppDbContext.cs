@@ -7,7 +7,7 @@ namespace FShop.CartApi.Context
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<Product>? Products{ get; set; }
-        public DbSet<CartItem> CartItens{ get; set; }
+        public DbSet<CartItem> CartItems{ get; set; }
         public DbSet<CartHeader> CartHeaders{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder mb)

@@ -52,27 +52,26 @@ namespace FShop.CartApi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "CartItns",
+                name: "CartItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    CardHeaderId = table.Column<int>(type: "int", nullable: false),
                     CartHeaderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CartItns", x => x.Id);
+                    table.PrimaryKey("PK_CartItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CartItns_CartHeaders_CartHeaderId",
+                        name: "FK_CartItems_CartHeaders_CartHeaderId",
                         column: x => x.CartHeaderId,
                         principalTable: "CartHeaders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CartItns_Products_ProductId",
+                        name: "FK_CartItems_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -81,20 +80,20 @@ namespace FShop.CartApi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartItns_CartHeaderId",
-                table: "CartItns",
+                name: "IX_CartItems_CartHeaderId",
+                table: "CartItems",
                 column: "CartHeaderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartItns_ProductId",
-                table: "CartItns",
+                name: "IX_CartItems_ProductId",
+                table: "CartItems",
                 column: "ProductId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CartItns");
+                name: "CartItems");
 
             migrationBuilder.DropTable(
                 name: "CartHeaders");

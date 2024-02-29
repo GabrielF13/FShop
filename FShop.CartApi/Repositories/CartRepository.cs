@@ -23,7 +23,7 @@ public class CartRepository : ICartRepository
 
         if (cartHeader is not null)
         {
-            _context.CartItens.RemoveRange(_context.CartItens.Where(c => c.CartHeaderId == cartHeader.Id));
+            _context.CartItems.RemoveRange(_context.CartItems.Where(c => c.CartHeaderId == cartHeader.Id));
             _context.CartHeaders.Remove(cartHeader);
             await _context.SaveChangesAsync();
             return true;
@@ -36,10 +36,10 @@ public class CartRepository : ICartRepository
         Cart cart = new()
         {
             CartHeader = await _context.CartHeaders
-                               .FirstOrDefaultAsync(c => c.UserId == userId),
+                              .FirstOrDefaultAsync(c => c.UserId == userId),
         };
 
-        cart.CartItens = _context.CartItens
+        cart.CartItems = _context.CartItems
                         .Where(c => c.CartHeaderId == cart.CartHeader.Id)
                         .Include(c => c.Product);
 
@@ -50,12 +50,12 @@ public class CartRepository : ICartRepository
     {
         try
         {
-            CartItem cartItem = await _context.CartItens
+            CartItem cartItem = await _context.CartItems
                                .FirstOrDefaultAsync(c => c.Id == cartItemId);
 
-            int total = _context.CartItens.Where(c => c.CartHeaderId == cartItem.CartHeaderId).Count();
+            int total = _context.CartItems.Where(c => c.CartHeaderId == cartItem.CartHeaderId).Count();
 
-            _context.CartItens.Remove(cartItem);
+            _context.CartItems.Remove(cartItem);
             await _context.SaveChangesAsync();
 
             if (total == 1)
@@ -96,27 +96,36 @@ public class CartRepository : ICartRepository
 
     private async Task UpdateQuantityAndItems(CartDTO cartDto, Cart cart, CartHeader? cartHeader)
     {
-        var cartItem = await _context.CartItens.AsNoTracking().FirstOrDefaultAsync(
-                               p => p.ProductId == cartDto.CartItens.FirstOrDefault()
+        try
+        {
+            var cartItem = await _context.CartItems.AsNoTracking().FirstOrDefaultAsync(
+                               p => p.ProductId == cartDto.CartItems.FirstOrDefault()
                                .ProductId && p.CartHeaderId == cartHeader.Id);
 
-        if (cartItem is null)
-        {
-            //Cria o CartItens
-            cart.CartItens.FirstOrDefault().CartHeaderId = cartHeader.Id;
-            cart.CartItens.FirstOrDefault().Product = null;
-            _context.CartItens.Add(cart.CartItens.FirstOrDefault());
-            await _context.SaveChangesAsync();
+            if (cartItem is null)
+            {
+                //Cria o CartItens
+                cart.CartItems.FirstOrDefault().CartHeaderId = cartHeader.Id;
+                cart.CartItems.FirstOrDefault().Product = null;
+                _context.CartItems.Add(cart.CartItems.FirstOrDefault());
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                cart.CartItems.FirstOrDefault().Product = null;
+                cart.CartItems.FirstOrDefault().Quantity += cartItem.Quantity;
+                cart.CartItems.FirstOrDefault().Id = cartItem.Id;
+                cart.CartItems.FirstOrDefault().CartHeaderId = cartItem.CartHeaderId;
+                _context.CartItems.Update(cart.CartItems.FirstOrDefault());
+                await _context.SaveChangesAsync();
+            }
         }
-        else
+        catch (Exception)
         {
-            cart.CartItens.FirstOrDefault().Product = null;
-            cart.CartItens.FirstOrDefault().Quantity += cartItem.Quantity;
-            cart.CartItens.FirstOrDefault().Id = cartItem.Id;
-            cart.CartItens.FirstOrDefault().CartHeaderId = cartItem.CartHeaderId;
-            _context.CartItens.Update(cart.CartItens.FirstOrDefault());
-            await _context.SaveChangesAsync();
+
+            throw;
         }
+        
     }
 
     private async Task CreateCartHeaderAndItems(Cart cart)
@@ -124,21 +133,22 @@ public class CartRepository : ICartRepository
         _context.CartHeaders.Add(cart.CartHeader);
         await _context.SaveChangesAsync();
 
-        cart.CartItens.FirstOrDefault().CartHeaderId = cart.CartHeader.Id;
-        cart.CartItens.FirstOrDefault().Product = null;
+        cart.CartItems.FirstOrDefault().CartHeaderId = cart.CartHeader.Id;
+        cart.CartItems.FirstOrDefault().Product = null;
 
-        _context.CartItens.Add(cart.CartItens.FirstOrDefault());
+        _context.CartItems.Add(cart.CartItems.FirstOrDefault());
 
         await _context.SaveChangesAsync();
     }
 
     private async Task SaveProductInDataBase(CartDTO cartDto, Cart cart)
     {
-        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == cartDto.CartItens.FirstOrDefault().ProductId);
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id ==
+                            cartDto.CartItems.FirstOrDefault().ProductId);
 
         if (product is null)
         {
-            _context.Products.Add(cart.CartItens.FirstOrDefault().Product);
+            _context.Products.Add(cart.CartItems.FirstOrDefault().Product);
             await _context.SaveChangesAsync();
         }
     }

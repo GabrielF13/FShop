@@ -63,7 +63,7 @@ namespace FShop.CartApi.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItns");
+                    b.ToTable("cartitems");
                 });
 
             modelBuilder.Entity("FShop.CartApi.Models.Product", b =>

@@ -68,7 +68,7 @@ namespace FShop.Web.Controllers
 
             List<CartItemViewModel> cartItemsVM = new List<CartItemViewModel>();
             cartItemsVM.Add(cartItem);
-            cart.CartItens = cartItemsVM;
+            cart.CartItems = cartItemsVM;
 
             var result = await _cartService.AddItemToCartAsync(cart, token);
 

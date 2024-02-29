@@ -59,7 +59,7 @@ namespace FShop.IdentityServer.SeedDatabase
                 };
 
                 //cria o usuário Admin e atribui a senha
-                IdentityResult resultAdmin = _userManager.CreateAsync(admin, "Numsey#2022").Result;
+                IdentityResult resultAdmin = _userManager.CreateAsync(admin, "Gabriel@324").Result;
                 if (resultAdmin.Succeeded)
                 {
                     //inclui o usuário admin ao perfil admin
