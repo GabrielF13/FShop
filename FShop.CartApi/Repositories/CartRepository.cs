@@ -1,6 +1,6 @@
-﻿using AutoMapper;
-using FShop.CartApi.Context;
+﻿using FShop.CartApi.Context;
 using FShop.CartApi.DTOs;
+using FShop.CartApi.DTOs.Mappings;
 using FShop.CartApi.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,12 +9,10 @@ namespace FShop.CartApi.Repositories;
 public class CartRepository : ICartRepository
 {
     private readonly AppDbContext _context;
-    private IMapper _mapper;
 
-    public CartRepository(AppDbContext context, IMapper mapper)
+    public CartRepository(AppDbContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
 
     public async Task<bool> CleanCartAsync(string userId)
@@ -43,7 +41,7 @@ public class CartRepository : ICartRepository
                         .Where(c => c.CartHeaderId == cart.CartHeader.Id)
                         .Include(c => c.Product);
 
-        return _mapper.Map<CartDTO>(cart);
+        return cart.ToDTO();
     }
 
     public async Task<bool> DeleteItemCartAsync(int cartItemId)
@@ -76,7 +74,7 @@ public class CartRepository : ICartRepository
 
     public async Task<CartDTO> UpdateCartAsync(CartDTO cartDto)
     {
-        Cart cart = _mapper.Map<Cart>(cartDto);
+        Cart cart = cartDto.ToEntity();
 
         await SaveProductInDataBase(cartDto, cart);
 
@@ -91,7 +89,7 @@ public class CartRepository : ICartRepository
         {
             await UpdateQuantityAndItems(cartDto, cart, cartHeader);
         }
-        return _mapper.Map<CartDTO>(cart);
+        return cart.ToDTO();
     }
 
     private async Task UpdateQuantityAndItems(CartDTO cartDto, Cart cart, CartHeader? cartHeader)

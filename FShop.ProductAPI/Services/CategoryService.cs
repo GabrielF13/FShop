@@ -1,6 +1,5 @@
-﻿using AutoMapper;
-using FShop.ProductAPI.DTOs;
-using FShop.ProductAPI.Models;
+﻿using FShop.ProductAPI.DTOs;
+using FShop.ProductAPI.DTOs.Mappings;
 using FShop.ProductAPI.Repositories;
 
 namespace FShop.ProductAPI.Services
@@ -8,38 +7,36 @@ namespace FShop.ProductAPI.Services
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IMapper _mapper;
 
-        public CategoryService(ICategoryRepository categoryRepository, IMapper mapper)
+        public CategoryService(ICategoryRepository categoryRepository)
         {
             _categoryRepository = categoryRepository;
-            _mapper = mapper;
         }
 
         public async Task<IEnumerable<CategoryDTO>> GetCategories()
         {
             var categoriesEntity = await _categoryRepository.GetAll();
-            return _mapper.Map<IEnumerable<CategoryDTO>>(categoriesEntity);
+            return categoriesEntity.ToDTO();
         }
         public async Task<IEnumerable<CategoryDTO>> GetCategoriesProducts()
         {
             var categoriesEntity = await _categoryRepository.GetCategoriesProducts();
-            return _mapper.Map<IEnumerable<CategoryDTO>>(categoriesEntity);
+            return categoriesEntity.ToDTO();
         }
         public async Task<CategoryDTO> GetCategoryById(int id)
         {
             var categoryEntity = await _categoryRepository.GetById(id);
-            return _mapper.Map<CategoryDTO>(categoryEntity);
+            return categoryEntity.ToDTO();
         }
         public async Task CreateCategory(CategoryDTO categoryDto)
         {
-            var categoryEntity = _mapper.Map<Category>(categoryDto);
+            var categoryEntity = categoryDto.ToEntity();
             await _categoryRepository.Create(categoryEntity);
             categoryDto.CategoryID = categoryEntity.CategoryID;
         }
         public async Task UpdateCategory(CategoryDTO categoryDto)
         {
-            var categoryEntity = _mapper.Map<Category>(categoryDto);
+            var categoryEntity = categoryDto.ToEntity();
             await _categoryRepository.Update(categoryEntity);
         }
 
